@@ -1,4 +1,4 @@
-export const flakeWidth = 400;
+export const flakeWidth = 150;
 
 export const tanSixty = Math.tan(Math.PI / 3);
 export const triangleHeight = (flakeWidth / 2) * tanSixty;

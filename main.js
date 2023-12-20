@@ -4,6 +4,8 @@ import "./style.css";
 
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d", { alpha: false });
+canvas.width = 800;
+canvas.height = 800;
 
 const bigFlakes = [];
 const smallFlakes = [];
@@ -37,53 +39,59 @@ function render() {
   ctx.lineWidth = 0.7;
   ctx.fillStyle = "white";
 
-  bigFlakes.forEach((flake) => {
-    renderKochSnowflake(1, flake.x, flake.y);
+  bigFlakes.forEach((flakeLayer) => {
+    flakeLayer.forEach((flake) => {
+      renderKochSnowflake(1, flake.x, flake.y);
+    });
   });
-  smallFlakes.forEach((flake) => {
-    renderKochSnowflake(1 / Math.sqrt(3), flake.x, flake.y, 30);
-  });
+  // smallFlakes.forEach((flake) => {
+  //   renderKochSnowflake(1 / Math.sqrt(3), flake.x, flake.y, 30);
+  // });
 }
 
 function init() {
-  const cntHorizontal = (window.innerWidth - flakeWidth / 2) / flakeWidth + 1;
-  const cntVertical = (window.innerWidth - flakeHeight / 2) / flakeHeight + 1;
-  for (let j = 0; j < cntVertical; j++) {
-    for (let i = 0; i < cntHorizontal; i++) {
-      bigFlakes.push({
-        x: flakeWidth * i,
-        y: ((2 * j + (i % 2)) * flakeHeight) / 2,
-      });
-      smallFlakes.push({
-        x: flakeWidth * i - smallFlakeHeight / 2,
-        y: ((2 * j + (1 - (i % 2))) * flakeHeight) / 2,
-      });
-      smallFlakes.push({
-        x: flakeWidth * i + smallFlakeHeight / 2,
-        y: ((2 * j + (1 - (i % 2))) * flakeHeight) / 2,
-      });
+  const cntHorizontal = canvas.width / flakeWidth;
+  const cntVertical = Math.ceil(
+    (canvas.height - flakeHeight * 0.5) / flakeHeight
+  );
+
+  let startY = flakeHeight * cntVertical;
+
+  for (let i = 0; i < 5; i++) {
+    bigFlakes[i] = [];
+    let testY = startY - flakeHeight * i;
+    let testX = 0;
+    while (true) {
+      if (testY > canvas.height + flakeHeight / 2) {
+        break;
+      }
+      if (testY > -flakeHeight / 2) {
+        bigFlakes[i].push({ x: testX, y: testY });
+      }
+
+      testX += flakeWidth;
+      testY += flakeHeight * 1.5;
     }
   }
-}
 
-function resize() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  render();
+  // for (let j = 0; j < cntVertical; j++) {
+  //   for (let i = 0; i < cntHorizontal; i++) {
+  //     bigFlakes.push({
+  //       x: flakeWidth * i,
+  //       y: ((2 * j + (i % 2)) * flakeHeight) / 2,
+  //     });
+  //     // smallFlakes.push({
+  //     //   x: flakeWidth * i - smallFlakeHeight / 2,
+  //     //   y: ((2 * j + (1 - (i % 2))) * flakeHeight) / 2,
+  //     // });
+  //     // smallFlakes.push({
+  //     //   x: flakeWidth * i + smallFlakeHeight / 2,
+  //     //   y: ((2 * j + (1 - (i % 2))) * flakeHeight) / 2,
+  //     // });
+  //   }
+  // }
 }
 
 init();
 
-window.addEventListener("resize", resize);
-const slider = document.getElementById("myRange");
-const output = document.getElementById("demo");
-output.innerHTML = slider.value;
-
-slider.oninput = function () {
-  output.innerHTML = this.value;
-  STEP = this.value;
-
-  render();
-};
-
-resize();
+render();
